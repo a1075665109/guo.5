@@ -1,3 +1,9 @@
+commit 9e48a50e7521216cfb5c9d5e4111b4860330d654
+Author: Yanchen Guo <guo@hoare7.cs.umsl.edu>
+Date:   Mon Nov 11 15:20:48 2019 -0600
+
+    added different functionalities
+
 commit a1639c30f8754ce0f482845e6e266765962e6f83
 Author: Yanchen Guo <guo@hoare7.cs.umsl.edu>
 Date:   Mon Nov 4 17:00:40 2019 -0600

@@ -1,0 +1,21 @@
+Yanchen Guo
+CS 4760
+Project 5
+
+For this project, compile it by first enter the command "make"
+It then creates an executable called "oss" and another called "user".
+Running the project by calling "./oss".
+It could also be ran with these command line arguments "-h -v".
+
+-h: displays all the avaliable command line arguments for this project then runs the program.
+-v: usage of this command turns on verbost.
+-t: signals the maximum allowed run time for this program, after the allowed time all processes will terminate.
+
+the default output file is logfile, default maximum run time is 5 seconds.
+
+The sharable resources are 4 randomly chosen resource types out of all 20 resources types.
+
+
+Version control through github, all the logs could be found under log.txt within the directory.
+
+make clean command will remove the executable and the default output file.
