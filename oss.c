@@ -13,7 +13,7 @@
 // structure for resource descriptor
 struct rd{
 	int resources[20];		
-	int avaliable[20];
+	int available[20];
 	int shared[4];
 };
 
@@ -186,6 +186,7 @@ int main(int argc, char *argv[]){
 	i=0;
 	while(i<20){
 		rd->resources[i] = rand()%50;
+		rd->available[i] = rd->resources[i];
 		i = i+1;
 	}
 
