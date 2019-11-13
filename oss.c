@@ -31,16 +31,17 @@ struct clock{
         unsigned int nano_sec;
 	int lines;
 	int grant;
+	int maxChild;
 };
 
 
-// variable the clock, pcb, maxtime and the output file.
+// variable the clock, prm, maxtime, the output file,rd.
 struct clock* clk;
 struct prm* prm;
 char *outputFile;
-int maxTime;
 struct rd* rd;
 int maxTime;
+
 
 // function for printing the allocated graph
 void printTable(){
@@ -57,6 +58,8 @@ void printTable(){
 		i = i+1;
 		clk->lines = clk->lines + 1;
 	}	
+	fprintf(fp,"\n");
+	clk->lines +=1;
 	fclose(fp);
 	return;
 }	
@@ -65,7 +68,7 @@ void printAllResource(){
 	FILE *fp;
         fp = fopen(outputFile,"a");
         
-        fprintf(fp,"Total resources : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+        fprintf(fp,"Total resources : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n\n",
 			rd->resources[0],rd->resources[1],rd->resources[2],rd->resources[3],rd->resources[4],
  			rd->resources[5],rd->resources[6],rd->resources[7],rd->resources[8],rd->resources[9],
 			rd->resources[10],rd->resources[11],rd->resources[12],rd->resources[13],rd->resources[14],
@@ -162,8 +165,11 @@ int main(int argc, char *argv[]){
                 perror("Shared memory attach\n");
                 return 0;
         }
+	
+	clk->lines=0;
         clk->sec=0;
         clk->nano_sec=0;
+	clk->maxChild = 18;
 
 	//initiating the process resource descriptor.
 	int i = 0;
@@ -173,9 +179,9 @@ int main(int argc, char *argv[]){
 			prm[i].maxClaim[j]=0;
 			prm[i].allocated[j]=0;
 			prm[i].needed[j]=0;
-			prm[i].pid=-1;
 			j = j+1;
 		}
+		prm[i].pid=-1;
 		i = i+1;
 	}
 
@@ -185,7 +191,7 @@ int main(int argc, char *argv[]){
 	// initializing the total amount of resources.
 	i=0;
 	while(i<20){
-		rd->resources[i] = rand()%50;
+		rd->resources[i] = rand()%50+1;
 		rd->available[i] = rd->resources[i];
 		i = i+1;
 	}
@@ -205,10 +211,13 @@ int main(int argc, char *argv[]){
         unsigned int ns;
 	// oss running infinitely until signal handles max run time
 	while(1){
-		if(clk->grant >= 20){
+		/*
+		if(clk->grant >=20){
 			printTable();
 			clk->grant = clk->grant-20;
 		}
+		*/
+
 		// if a child process has yet been picked , pick a time interval to fork
 		if(picked == 0){
                         s = clk->sec;
@@ -219,11 +228,13 @@ int main(int argc, char *argv[]){
                         }
                         picked = 1;
                 }	
+		if(clk->lines >= 10000){
+			alarm(0);
+		}
 
+		// clock continues to run, every loop increments the clock by 250000000 nano-seconds
 
-		// clock continues to run, every loop increments the clock by 250 milliseconds
-
-                clk->nano_sec = clk->nano_sec +250;
+                clk->nano_sec = clk->nano_sec +250000000;
                 if(clk->nano_sec >= maxTimeNS){
                         clk->sec = clk->sec +1;
                         clk->nano_sec =0;
@@ -232,8 +243,24 @@ int main(int argc, char *argv[]){
 		//if the amount of time interval has passed and it is time to start another process
                 if(clk->sec >= s && picked == 1){
                         if(clk->nano_sec >= ns){
-				printf("passed\n");
-				return 0;
+				picked = 0;		
+				if(clk->maxChild>0){
+					int i =0;
+                                        while(i<18){
+                                                if(prm[i].pid == -1){
+                                                        break;
+                                                }
+                                                i+=1;
+                                        }
+                                        clk->maxChild = clk->maxChild -1;
+					int child_pid = fork();
+					if(child_pid <=0){
+						execvp("./user",NULL);		
+						exit(0);
+                                        }else{
+						prm[i].pid=child_pid;
+					}
+				}
 			}
 		}
 	}

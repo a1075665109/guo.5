@@ -5,16 +5,43 @@ Project 5
 For this project, compile it by first enter the command "make"
 It then creates an executable called "oss" and another called "user".
 Running the project by calling "./oss".
-It could also be ran with these command line arguments "-h -v".
+It could also be ran with these command line arguments "-h -t".
 
 -h: displays all the avaliable command line arguments for this project then runs the program.
--v: usage of this command turns on verbost.
 -t: signals the maximum allowed run time for this program, after the allowed time all processes will terminate.
+
+
+
+explanation on what could be the result of running the program:
+
+	I populated the child process resources with shared memory in a loop by checking the available and then choosing a max claim, 
+	then randomly choosing a number between 0 and the max claim to obtain an allocated number,
+	finally deducting the allocated from the available amount.
+	
+	the loop for populating the child process with resources may not complete because of hoare, that leads to no output
+	of granting and releasing resources because that comes after the child process is done populating.
+	
+	I also give a time limit on when the child process should end and that is 2 seconds.
+
+	I had the resource table printed to the output file every time a resource is being allocated or released
+	because due to hoare, I hardly ever get a run where it granted or released over 20 resources after populating, 
+	Sometimes the program wouldn't even reaches the granting and releasing par. 
+	So I output the table to the logfile to show some result even though the program never fully completed.
+
+	If no child process could be created due to fork() on hoare, then the only output should be a total amount of resources.
+
+
+
+In this program there are a total of 20 types of resources and each of them could hae up to 50 resources choosen though rng between 1-50
+
+existing problems:
+		Repetition of the same resource table, I double checked the output and made sure it only happens on populating,releasing
+		and granting. Not sure where I messed up.
+
 
 the default output file is logfile, default maximum run time is 5 seconds.
 
 The sharable resources are 4 randomly chosen resource types out of all 20 resources types.
-
 
 Version control through github, all the logs could be found under log.txt within the directory.
 
