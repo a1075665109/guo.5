@@ -6,7 +6,10 @@
 #include <signal.h>
 #include <time.h>
 
+// max amount of lines and nano-sec to sec ratio
 #define maxLine 10000
+#define maxTimeNS 1000000000
+
 // structure for resource descriptor
 struct rd{
 	int resources[20];		
@@ -26,6 +29,8 @@ struct prm{
 struct clock{
         unsigned int sec;
         unsigned int nano_sec;
+	int lines;
+	int grant;
 };
 
 
@@ -38,9 +43,37 @@ struct rd* rd;
 int maxTime;
 
 // function for printing the allocated graph
+void printTable(){
+	FILE *fp;
+	fp = fopen(outputFile,"a");
+	int i =0;
+	while (i<18){
+		fprintf(fp,"Process %d: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",prm[i].pid,
+			prm[i].allocated[0],prm[i].allocated[1],prm[i].allocated[2],prm[i].allocated[3],
+			prm[i].allocated[4],prm[i].allocated[5],prm[i].allocated[6],prm[i].allocated[7],
+			prm[i].allocated[8],prm[i].allocated[9],prm[i].allocated[10],prm[i].allocated[11],
+			prm[i].allocated[12],prm[i].allocated[13],prm[i].allocated[14],prm[i].allocated[15],
+			prm[i].allocated[16],prm[i].allocated[17],prm[i].allocated[18],prm[i].allocated[19]);
+		i = i+1;
+		clk->lines = clk->lines + 1;
+	}	
+	fclose(fp);
+	return;
+}	
 
-
-
+void printAllResource(){
+	FILE *fp;
+        fp = fopen(outputFile,"a");
+        
+        fprintf(fp,"Total resources : %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+			rd->resources[0],rd->resources[1],rd->resources[2],rd->resources[3],rd->resources[4],
+ 			rd->resources[5],rd->resources[6],rd->resources[7],rd->resources[8],rd->resources[9],
+			rd->resources[10],rd->resources[11],rd->resources[12],rd->resources[13],rd->resources[14],
+			rd->resources[15],rd->resources[16],rd->resources[17],rd->resources[18],rd->resources[19]);
+        clk->lines = clk->lines + 1;
+        fclose(fp);
+        return;
+}
 
 // alarm handler that kills all processes
 void alarmHandler(int sig){
@@ -152,33 +185,57 @@ int main(int argc, char *argv[]){
 	// initializing the total amount of resources.
 	i=0;
 	while(i<20){
-		rd->resources[i] = rand()%21;
+		rd->resources[i] = rand()%50;
 		i = i+1;
 	}
 
 	// set up the shared memories.
 	i =0;
-	while(i<4){
-                rd->shared[i] = 0;
-        	i = i+1;
-	}
 	i=0;
 	while(i<4){
 		rd->shared[i] = rand()%21;
 		i = i+1;
 	}	
+	// print all the resources to the output file
+	printAllResource();
+
+	int picked =0;
+	unsigned int s;
+        unsigned int ns;
+	// oss running infinitely until signal handles max run time
+	while(1){
+		if(clk->grant >= 20){
+			printTable();
+			clk->grant = clk->grant-20;
+		}
+		// if a child process has yet been picked , pick a time interval to fork
+		if(picked == 0){
+                        s = clk->sec;
+                        ns = clk->nano_sec + rand()%(10000000000)+1;
+                        if(ns>= maxTimeNS){
+                                s = s+1;
+                                ns = ns-maxTimeNS;
+                        }
+                        picked = 1;
+                }	
 
 
+		// clock continues to run, every loop increments the clock by 250 milliseconds
 
-
-
-
-
-
-
-
+                clk->nano_sec = clk->nano_sec +250;
+                if(clk->nano_sec >= maxTimeNS){
+                        clk->sec = clk->sec +1;
+                        clk->nano_sec =0;
+                }
+		
+		//if the amount of time interval has passed and it is time to start another process
+                if(clk->sec >= s && picked == 1){
+                        if(clk->nano_sec >= ns){
+				printf("passed\n");
+				return 0;
+			}
+		}
+	}
 
 	return 0;
-
-
 }

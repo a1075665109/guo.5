@@ -1,3 +1,9 @@
+commit b323cfaadfe8b8258d4b949d3be3d25e7d64d514
+Author: Yanchen Guo <guo@hoare7.cs.umsl.edu>
+Date:   Tue Nov 12 17:44:40 2019 -0600
+
+    oss functionality and rd initialization
+
 commit 9e48a50e7521216cfb5c9d5e4111b4860330d654
 Author: Yanchen Guo <guo@hoare7.cs.umsl.edu>
 Date:   Mon Nov 11 15:20:48 2019 -0600

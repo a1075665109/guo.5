@@ -1,7 +1,7 @@
 all: oss
 
 clean:
-	-rm oss
+	-rm oss logfile
 
 dt:
 	gcc -o oss.c oss 
